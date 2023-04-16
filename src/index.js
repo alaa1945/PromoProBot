@@ -170,7 +170,7 @@ async function sendMessagesToAllGroups() {
       if (totalGroups === i) {
         setTimeout(() => {
           sendMessagesToAllGroups();
-        }, 600000); // Wait 10 minutes before sending messages again
+        }, 28800000 ); // Wait 8 hours minutes before sending messages again
       }
     }
   }, 60000);
