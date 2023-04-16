@@ -1,13 +1,9 @@
 const TelegramBot = require("node-telegram-bot-api");
 const mongoose = require("mongoose");
 require("dotenv").config();
-
 const TOKEN = process.env.TOKEN;
 const MONGO_URI = process.env.MONGO_URI;
-
 const bot = new TelegramBot(TOKEN, { polling: true });
-
-//mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.connect(MONGO_URI);
 
 const GroupSchema = new mongoose.Schema({
@@ -15,12 +11,14 @@ const GroupSchema = new mongoose.Schema({
 });
 
 const Group = mongoose.model("Group", GroupSchema);
+
 bot.onText(/\/addGroup/, (msg) => {
   bot.sendMessage(
     msg.chat.id,
     "To add the bot to a new group type /addGroup <@group_id>"
   );
 });
+
 bot.onText(/\/removeGroup/, (msg) => {
   bot.sendMessage(
     msg.chat.id,
@@ -82,21 +80,14 @@ bot.onText(/\/removeGroup (.+)/, (msg, match) => {
 bot.onText(/\/start/, (msg) => {
   bot.sendMessage(
     msg.chat.id,
-    "Hello! Welcome to MyBot. Type /help to see the list of available commands."
+    "Hello! Thank you for reaching out to PromoProBot. To contact the bot owner for any inquiries or assistance, please message @kingmarketing26 directly. Our team will be happy to assist you further. Thank you!"
   );
 });
 
 bot.onText(/\/info/, (msg) => {
   bot.sendMessage(
     msg.chat.id,
-    "MyBot is a simple Telegram bot created with Node.js. It can send messages to multiple groups with a maximum of 84 messages per hour."
-  );
-});
-
-bot.onText(/\/sendmsg/, (msg) => {
-  bot.sendMessage(
-    msg.chat.id,
-    "To send a message, use the following format: /sendmsg <message>."
+    "PromoProBot is a powerful Telegram bot designed to assist with promoting messages in multiple groups. With PromoPro, you can easily schedule and send promotional messages to up to 1000 groups, helping you to reach a wider audience and boost your message's visibility."
   );
 });
 
@@ -106,20 +97,20 @@ bot.onText(/\/help/, (msg) => {
     "Available commands:\n" +
       "/start - Start the bot\n" +
       "/info - Get information about the bot\n" +
-      "/sendmsg - Send a message to the groups\n" +
-      "/setgroups - Set the groups to send messages to\n" +
       "/help - Show this help message\n" +
       "/addGroup - To add the bot to a new group\n" +
       "/removeGroup - To remove the bot from a group"
   );
 });
 
-const url = "https://media1.giphy.com/media/kHC4qdJwYqIWjo5IM6/giphy.gif";
+const message =
+  "Hey there! 🚀\n\nJoin us at DriveShareDAO, the future of sharing economy on blockchain! Earn passive income by renting out your car or sharing rides. Join our community now: https://t.me/drivesharedao. Don't miss out! 🌐";
+
 const maxMessagesPerHour = 84;
 //const interval = 3600000 / maxMessagesPerHour;
 let currentHourMessages = 0;
 
-let grp_ids=[];
+let grp_ids = [];
 async function getGroupNames() {
   try {
     const result = await Group.find();
@@ -130,16 +121,15 @@ async function getGroupNames() {
   }
 }
 
-
 async function sendMessagesToAllGroups() {
-  
-  const groupIds=await getGroupNames();
+  const groupIds = await getGroupNames();
   let i = 0;
   const totalGroups = groupIds.length;
 
   const sendMessageIntervalId = setInterval(() => {
     if (i < totalGroups) {
-          bot.sendAnimation(groupIds[i], url);
+      bot.sendMessage(groupIds[i], message);
+      // bot.sendAnimation(groupIds[i], url);
       i++;
       currentHourMessages++;
       if (currentHourMessages >= maxMessagesPerHour) {
@@ -158,7 +148,7 @@ async function sendMessagesToAllGroups() {
       }
     }
   }, 60000);
-   // 1 minute interval between each message
+  // 1 minute interval between each message
 }
 
 sendMessagesToAllGroups();
