@@ -1,10 +1,30 @@
+const express = require("express");
 const TelegramBot = require("node-telegram-bot-api");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const TOKEN = process.env.TOKEN;
 const MONGO_URI = process.env.MONGO_URI;
+const app = express();
+
+const PORT = process.env.PORT || 3000;
+
+app.get("/", (req, res) => {
+  res.send("Hello, world!");
+});
+
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
+
 const bot = new TelegramBot(TOKEN, { polling: true });
 mongoose.connect(MONGO_URI);
+
+const db = mongoose.connection;
+
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", function () {
+  console.log("Connected to MongoDB database");
+});
 
 const GroupSchema = new mongoose.Schema({
   name: String,
