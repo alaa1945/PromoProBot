@@ -5,26 +5,32 @@ require("dotenv").config();
 const TOKEN = process.env.TOKEN;
 const MONGO_URI = process.env.MONGO_URI;
 const app = express();
+mongoose.set('strictQuery',false);
 
 const PORT = process.env.PORT || 3000;
+
+const connectDB = async()=>{
+  try{
+  const conn=await mongoose.connect(MONGO_URI);
+  console.log(`MongoDB Connected: ${conn.connection.host}`);
+  }catch(error){
+    console.log(error);
+    process.exit(1);
+  }
+};
 
 app.get("/", (req, res) => {
   res.send("Hello, world!");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+connectDB().then(()=>{
+  app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+  });
+})
+
 
 const bot = new TelegramBot(TOKEN, { polling: true });
-mongoose.connect(MONGO_URI);
-
-const db = mongoose.connection;
-
-db.on("error", console.error.bind(console, "connection error:"));
-db.once("open", function () {
-  console.log("Connected to MongoDB database");
-});
 
 const GroupSchema = new mongoose.Schema({
   name: String,
